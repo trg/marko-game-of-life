@@ -1,0 +1,127 @@
+// Normally, I recommend using Mutli-file components [1], but for the sake of
+// easy readability on Github, the components in this sample app are in one file
+// The primary difference is each section (JS, style, and HTML) would be in it's
+// own file if this were a multi-file component
+// [1] http://markojs.com/docs/components/#multi-file-components
+
+class {
+    // Initialize the board here
+    onCreate(input) {
+        this.state = {
+            // height: input.height, // Height of the game board
+            // width: input.width,   // Width of the game board
+            boardState: Array(input.height).fill().map(()=> new Array(input.width)),
+            playing: false // true when the game is being played, false when not
+        };
+    }
+
+    // Randomizes the alive / not alive states of each cell
+    randomizeBoard() {
+        for(let y = 0; y < this.getHeight(); y++) {
+            for(let x = 0; x < this.getWidth(); x++) {
+                this.state.boardState[y][x] = (Math.random() >= 0.76);
+            }
+        }
+        this.setStateDirty('boardState');
+    }
+
+    // Convenience Methods
+    getBoardState() {
+        return this.state.boardState;
+    }
+    getWidth() {
+        return this.getBoardState()[0].length;
+    }
+    getHeight() {
+        return this.getBoardState().length;
+    }
+    cellIsAlive(x, y) {
+        return this.getBoardState()[y][x];
+    }
+    textForCell(x, y) {
+        if (this.cellIsAlive(x, y)) {
+            return "X";
+        }
+        return "&nbsp;";
+    }
+    togglePoint(x, y) {
+        this.state.boardState[y][x] = !this.state.boardState[y][x];
+        this.setStateDirty('boardState');
+    }
+
+    calculateNextTile(x, y) {
+        // Accumulate count of all neighbors
+        const aliveNeighborCount = [
+            [-1, -1], [0,-1], [1, -1],
+            [-1,  0], /*:)*/, [1,  0],
+            [-1,  1], [0, 1], [1,  1]
+        ].reduce((aliveNeighborCounter, relativePositionVector) => {
+            const neightborX = x + relativePositionVector[0];
+            const neightborY = y + relativePositionVector[1];
+            if (typeof this.state.boardState[neightborY] !== "undefined" &&
+                typeof this.state.boardState[neightborY][neightborX] !== "undefined" &&
+                this.state.boardState[neightborY][neightborX]) {
+                aliveNeighborCounter++;
+            }
+            return aliveNeighborCounter;
+        }, 0);
+        console.log(`${x}, ${y} has ${aliveNeighborCount} alive neighbors`);
+        const currentCellAlive = this.state.boardState[y][x] === true;
+        if (currentCellAlive) {
+            return (aliveNeighborCount === 2 || aliveNeighborCount === 3);
+        }
+        return aliveNeighborCount === 3;
+    }
+
+    // Calculates + Sets the state for the next iteration
+    nextIteration() {
+        const nextBoardState = new Array(this.getHeight());
+        for(let y = 0; y < this.getHeight(); y++) {
+            nextBoardState[y] = new Array(this.state.boardState[y].length);
+            for(let x = 0; x < this.getWidth(); x++) {
+                nextBoardState[y][x] = this.calculateNextTile(x, y);
+            }
+        }
+        this.state.boardState = nextBoardState;
+    }
+}
+
+
+
+style {
+    body {
+        font-family: monospace;
+    }
+    table {
+        user-select: none; /* Try to avoid accidentally selecting rows while toggling */
+        border-top: 1px solid #eee;
+        border-left: 1px solid #eee;
+    }
+    td {
+        cursor: pointer;
+        border-right: 1px solid #eee;
+        border-bottom: 1px solid #eee;
+        width: 12px;
+    }
+}
+
+// You may use concise syntax, however I prefer the HTML version
+<table>
+    <tbody>
+        <tr for(let y = 0; y < component.getHeight(); y++)>
+            <td for(let x = 0; x < component.getWidth(); x++)
+                on-click("togglePoint", x, y)> <!-- You can pass in arguments to clicks this way -->
+                $!{component.textForCell(x, y)}
+            </td>
+        </tr>
+    </tbody>
+</table>
+<br />
+<button on-click('nextIteration')>
+    Next Iteration
+</button>
+<br />
+<br />
+<button on-click('randomizeBoard')>
+    Randomize Board
+</button>
