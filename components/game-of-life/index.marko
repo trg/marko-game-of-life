@@ -38,12 +38,9 @@ class {
     cellIsAlive(x, y) {
         return this.getBoardState()[y][x];
     }
-    textForCell(x, y) {
-        if (this.cellIsAlive(x, y)) {
-            return "X";
-        }
-        return "&nbsp;";
-    }ch
+    cellEnabled(x, y) {
+        return this.cellIsAlive(x, y);
+    }
     togglePoint(x, y) {
         this.state.boardState[y][x] = !this.state.boardState[y][x];
         this.setStateDirty('boardState');
@@ -93,7 +90,7 @@ class {
     }
 
     play() {
-        setInterval(tick.bind(this), 100);
+        setInterval(this.tick.bind(this), 500);
     }
 }
 
@@ -105,37 +102,42 @@ style {
     }
     table {
         user-select: none; /* Try to avoid accidentally selecting rows while toggling */
-        border-top: 1px solid #eee;
-        border-left: 1px solid #eee;
+        border: 1px solid #eee;
+        margin: 10px;
     }
     td {
         cursor: pointer;
-        border-right: 1px solid #eee;
-        border-bottom: 1px solid #eee;
-        height: 10px;
-        width: 10px;
+        height: 17px;
+        width: 14px;
+    }
+    button {
+        margin-left: 10px;
+    }
+    .cell-enabled {
+        background: #000000;
     }
 }
 
 
 // You may use concise syntax, however I prefer the HTML version
 <div>
-    <button on-click('nextIteration')>
+    <!-- <button on-click('tick')>
         Next Iteration
-    </button>
+    </button> -->
     <button on-click('randomizeBoard')>
         Randomize Board
     </button>
     <button on-click('play')>
-        Go
+        Automatically Play
     </button>
 
     <table>
         <tbody>
             <tr for(let y = 0; y < component.getHeight(); y++)>
                 <td for(let x = 0; x < component.getWidth(); x++)
-                    on-click("togglePoint", x, y)> <!-- You can pass in arguments to clicks this way -->
-                    $!{component.textForCell(x, y)}
+                    on-click("togglePoint", x, y)
+                    class={ "cell-enabled": component.cellEnabled(x, y) }>
+                    &nbsp;
                 </td>
             </tr>
         </tbody>
