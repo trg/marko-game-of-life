@@ -23,3 +23,8 @@ And then go to [http://localhost:8080](http://localhost:8080)
 ## To Play
 
 Click tiles to toggle them on or off, hit Automatically Play.
+
+## I don't care about the Game of Life, show me the guts!
+
+- [Single Component File](https://github.com/trg/marko-game-of-life/blob/master/components/game-of-life/index.marko)
+- [The Index File that Includes the Component](https://github.com/trg/marko-game-of-life/blob/master/routes/index/index.marko)
