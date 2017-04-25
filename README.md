@@ -5,8 +5,9 @@ Just a demo of [Conway's Game of Life](https://en.wikipedia.org/wiki/Conway%27s_
 ## Install
 
 Prerequisites:
-    - yarn (npm probably works)
-    - node 6 (probably others)
+
+- yarn (npm probably works)
+- node 6 (probably others)
 
     $ git clone https://github.com/trg/marko-game-of-life; cd marko-game-of-life
     $ yarn install
