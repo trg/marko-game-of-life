@@ -8,8 +8,8 @@ class {
     // Initialize the board here
     onCreate(input) {
         this.state = {
-            // height: input.height, // Height of the game board
-            // width: input.width,   // Width of the game board
+            height: input.height, // Height of the game board
+            width: input.width,   // Width of the game board
             boardState: Array(input.height).fill().map(()=> new Array(input.width)),
             playing: false // true when the game is being played, false when not
         };
@@ -43,7 +43,7 @@ class {
             return "X";
         }
         return "&nbsp;";
-    }
+    }ch
     togglePoint(x, y) {
         this.state.boardState[y][x] = !this.state.boardState[y][x];
         this.setStateDirty('boardState');
@@ -65,7 +65,6 @@ class {
             }
             return aliveNeighborCounter;
         }, 0);
-        console.log(`${x}, ${y} has ${aliveNeighborCount} alive neighbors`);
         const currentCellAlive = this.state.boardState[y][x] === true;
         if (currentCellAlive) {
             return (aliveNeighborCount === 2 || aliveNeighborCount === 3);
@@ -74,7 +73,7 @@ class {
     }
 
     // Calculates + Sets the state for the next iteration
-    nextIteration() {
+    getNextIteration() {
         const nextBoardState = new Array(this.getHeight());
         for(let y = 0; y < this.getHeight(); y++) {
             nextBoardState[y] = new Array(this.state.boardState[y].length);
@@ -82,7 +81,19 @@ class {
                 nextBoardState[y][x] = this.calculateNextTile(x, y);
             }
         }
+        return nextBoardState;
+    }
+
+    setNextIteration(nextBoardState) {
         this.state.boardState = nextBoardState;
+    }
+
+    tick() {
+        this.setNextIteration(this.getNextIteration());
+    }
+
+    play() {
+        setInterval(tick.bind(this), 100);
     }
 }
 
@@ -101,27 +112,32 @@ style {
         cursor: pointer;
         border-right: 1px solid #eee;
         border-bottom: 1px solid #eee;
-        width: 12px;
+        height: 10px;
+        width: 10px;
     }
 }
 
+
 // You may use concise syntax, however I prefer the HTML version
-<table>
-    <tbody>
-        <tr for(let y = 0; y < component.getHeight(); y++)>
-            <td for(let x = 0; x < component.getWidth(); x++)
-                on-click("togglePoint", x, y)> <!-- You can pass in arguments to clicks this way -->
-                $!{component.textForCell(x, y)}
-            </td>
-        </tr>
-    </tbody>
-</table>
-<br />
-<button on-click('nextIteration')>
-    Next Iteration
-</button>
-<br />
-<br />
-<button on-click('randomizeBoard')>
-    Randomize Board
-</button>
+<div>
+    <button on-click('nextIteration')>
+        Next Iteration
+    </button>
+    <button on-click('randomizeBoard')>
+        Randomize Board
+    </button>
+    <button on-click('play')>
+        Go
+    </button>
+
+    <table>
+        <tbody>
+            <tr for(let y = 0; y < component.getHeight(); y++)>
+                <td for(let x = 0; x < component.getWidth(); x++)
+                    on-click("togglePoint", x, y)> <!-- You can pass in arguments to clicks this way -->
+                    $!{component.textForCell(x, y)}
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
