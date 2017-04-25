@@ -9,6 +9,8 @@ Prerequisites:
 - yarn (npm probably works)
 - node 6 (probably others)
 
+In your terminal:
+
     $ git clone https://github.com/trg/marko-game-of-life; cd marko-game-of-life
     $ yarn install
 
